@@ -99,8 +99,8 @@
         <div class="divider text-xs opacity-70">OR SIGN UP WITH</div>
         
         <!-- Social Login Buttons -->
-        <div class="flex gap-2">
-          <button class="btn btn-outline flex-1">
+        <div class="flex">
+          <button class="btn btn-outline w-full">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 48 48">
               <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
               <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
@@ -108,12 +108,6 @@
               <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path>
             </svg>
             Google
-          </button>
-          <button class="btn btn-outline flex-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24">
-              <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"/>
-            </svg>
-            LinkedIn
           </button>
         </div>
         
@@ -167,30 +161,26 @@ const handleRegister = async () => {
     isLoading.value = true;
     errorMessage.value = '';
     
-    // Simulate API call with a delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Call the register API endpoint
+    const response = await $fetch('/api/auth/register', {
+      method: 'POST',
+      body: { 
+        username: name.value,
+        email: email.value, 
+        password: password.value 
+      }
+    });
     
-    // Here you would typically make an API call to register
-    // For example:
-    // const response = await fetch('/api/register', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ 
-    //     name: name.value,
-    //     email: email.value, 
-    //     password: password.value 
-    //   })
-    // });
-    
-    // if (!response.ok) {
-    //   const errorData = await response.json();
-    //   throw new Error(errorData.message || 'Registration failed');
-    // }
-    
-    // For demo purposes, we're just redirecting
-    router.push('/dashboard');
+    if (response.success) {
+      // Show success message and redirect to login page
+      alert(response.message || 'Registration successful! You can now log in.');
+      router.push('/login');
+    } else {
+      errorMessage.value = response.message || 'Registration failed. Please try again.';
+    }
   } catch (error) {
-    errorMessage.value = error.message || 'Registration failed. Please try again.';
+    console.error('Registration error:', error);
+    errorMessage.value = error.data?.statusMessage || 'Registration failed. Please try again.';
   } finally {
     isLoading.value = false;
   }
