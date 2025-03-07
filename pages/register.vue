@@ -2,11 +2,25 @@
   <div class="min-h-screen bg-base-200 flex items-center justify-center">
     <div class="card w-full max-w-md bg-base-100 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title text-2xl font-bold text-center mb-6">Login</h2>
+        <h2 class="card-title text-2xl font-bold text-center mb-6">Create an Account</h2>
         
-        <form @submit.prevent="handleLogin">
-          <!-- Email Input -->
+        <form @submit.prevent="handleRegister">
+          <!-- Name Input -->
           <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text">Full Name</span>
+            </label>
+            <input 
+              type="text" 
+              v-model="name" 
+              placeholder="John Doe" 
+              class="input input-bordered w-full" 
+              required
+            />
+          </div>
+          
+          <!-- Email Input -->
+          <div class="form-control w-full mt-4">
             <label class="label">
               <span class="label-text">Email</span>
             </label>
@@ -23,13 +37,12 @@
           <div class="form-control w-full mt-4">
             <label class="label">
               <span class="label-text">Password</span>
-              <a href="#" class="label-text-alt link link-hover">Forgot password?</a>
             </label>
             <div class="relative">
               <input 
                 :type="showPassword ? 'text' : 'password'" 
                 v-model="password" 
-                placeholder="Enter your password" 
+                placeholder="Create a password" 
                 class="input input-bordered w-full pr-10" 
                 required
               />
@@ -42,31 +55,48 @@
                 <span v-else class="text-sm opacity-70">Show</span>
               </button>
             </div>
-          </div>
-          
-          <!-- Remember Me Checkbox -->
-          <div class="form-control mt-4">
-            <label class="cursor-pointer label justify-start gap-2">
-              <input type="checkbox" v-model="rememberMe" class="checkbox checkbox-sm" />
-              <span class="label-text">Remember me</span>
+            <label class="label">
+              <span class="label-text-alt">Password must be at least 8 characters</span>
             </label>
           </div>
           
-          <!-- Login Button -->
+          <!-- Confirm Password Input -->
+          <div class="form-control w-full mt-4">
+            <label class="label">
+              <span class="label-text">Confirm Password</span>
+            </label>
+            <input 
+              type="password" 
+              v-model="confirmPassword" 
+              placeholder="Confirm your password" 
+              class="input input-bordered w-full" 
+              required
+            />
+          </div>
+          
+          <!-- Terms Checkbox -->
+          <div class="form-control mt-4">
+            <label class="cursor-pointer label justify-start gap-2">
+              <input type="checkbox" v-model="agreeToTerms" class="checkbox checkbox-sm" required />
+              <span class="label-text">I agree to the <a href="#" class="link link-primary">Terms of Service</a> and <a href="#" class="link link-primary">Privacy Policy</a></span>
+            </label>
+          </div>
+          
+          <!-- Register Button -->
           <div class="form-control mt-6">
             <button 
               type="submit" 
               class="btn btn-primary"
-              :disabled="isLoading"
+              :disabled="isLoading || !passwordsMatch || !agreeToTerms"
             >
               <span v-if="isLoading" class="loading loading-spinner loading-sm"></span>
-              {{ isLoading ? 'Logging in...' : 'Login' }}
+              {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
             </button>
           </div>
         </form>
         
         <!-- Divider -->
-        <div class="divider text-xs opacity-70">OR CONTINUE WITH</div>
+        <div class="divider text-xs opacity-70">OR SIGN UP WITH</div>
         
         <!-- Social Login Buttons -->
         <div class="flex gap-2">
@@ -87,10 +117,10 @@
           </button>
         </div>
         
-        <!-- Sign Up Link -->
+        <!-- Login Link -->
         <div class="text-center mt-4">
-          <p>Don't have an account? 
-            <NuxtLink to="/register" class="link link-primary">Sign up</NuxtLink>
+          <p>Already have an account? 
+            <NuxtLink to="/" class="link link-primary">Login</NuxtLink>
           </p>
         </div>
         
@@ -105,46 +135,62 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
 // Form data
+const name = ref('');
 const email = ref('');
 const password = ref('');
-const rememberMe = ref(false);
+const confirmPassword = ref('');
+const agreeToTerms = ref(false);
 const showPassword = ref(false);
 const isLoading = ref(false);
 const errorMessage = ref('');
 
-// Login handler
-const handleLogin = async () => {
+// Computed properties
+const passwordsMatch = computed(() => {
+  return !password.value || !confirmPassword.value || password.value === confirmPassword.value;
+});
+
+// Register handler
+const handleRegister = async () => {
   try {
+    // Validate passwords match
+    if (password.value !== confirmPassword.value) {
+      errorMessage.value = 'Passwords do not match';
+      return;
+    }
+    
     isLoading.value = true;
     errorMessage.value = '';
     
     // Simulate API call with a delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // Here you would typically make an API call to authenticate
+    // Here you would typically make an API call to register
     // For example:
-    // const response = await fetch('/api/login', {
+    // const response = await fetch('/api/register', {
     //   method: 'POST',
     //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ email: email.value, password: password.value })
+    //   body: JSON.stringify({ 
+    //     name: name.value,
+    //     email: email.value, 
+    //     password: password.value 
+    //   })
     // });
     
     // if (!response.ok) {
-    //   throw new Error('Invalid credentials');
+    //   const errorData = await response.json();
+    //   throw new Error(errorData.message || 'Registration failed');
     // }
-    
-    // const data = await response.json();
     
     // For demo purposes, we're just redirecting
     router.push('/dashboard');
   } catch (error) {
-    errorMessage.value = error.message || 'Login failed. Please try again.';
+    errorMessage.value = error.message || 'Registration failed. Please try again.';
   } finally {
     isLoading.value = false;
   }

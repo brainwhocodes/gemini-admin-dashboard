@@ -1,7 +1,15 @@
 {
   "name": "nuxt-app",
+  "dependencies": {
+    "@google/generative-ai": "^0.22.0",
+    "@tailwindcss/vite": "^4.0.9",
+    "better-sqlite3": "^11.8.1",
+    "nuxt": "^3.15.4",
+    "tailwindcss": "^4.0.9",
+    "vue": "latest",
+    "vue-router": "latest"
+  },
   "private": true,
-  "type": "module",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -9,14 +17,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
-  "dependencies": {
-    "better-sqlite3": "^11.8.1",
-    "nuxt": "^3.15.4",
-    "vue": "latest",
-    "vue-router": "latest"
-  },
+  "type": "module",
   "devDependencies": {
-    "bulma": "^1.0.3",
-    "sass": "^1.85.1"
+    "daisyui": "^5.0.0"
   }
 }
